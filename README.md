@@ -1,7 +1,7 @@
 # Phase Space
 
-**Play:** https://YOUR-USERNAME.github.io/phase-space/
-**How to play:** https://YOUR-USERNAME.github.io/phase-space/guide/
+**Play:** https://francisadedeji.github.io/phase-space/
+**How to play:** https://francisadedeji.github.io/phase-space/guide.html
 
 Phase Space is a browser game about guidance, navigation and control for a 3U CubeSat, PS-1. It teaches astrodynamics and Hamiltonian mechanics by letting you fly them. It is built around the idea in Boodram and Scheeres, "Controlling Hamiltonian Integral Invariants of Spacecraft Phase Space Distributions," *Journal of Guidance, Control, and Dynamics* 48(5), 2025, [doi:10.2514/1.G008470](https://doi.org/10.2514/1.G008470): guidance laws designed by their divergence to collapse the phase-space volume of a cloud of possible spacecraft states.
 
@@ -22,7 +22,7 @@ The game is a single static HTML file. It draws the 3D scene with [Three.js](htt
 
 ## How to play
 
-The [how-to-play guide](guide/) covers the controls, all 30 missions and a step-by-step walkthrough for each level. In the game, the **How to play** button in the top bar opens it.
+The [how-to-play guide](guide.html) covers the controls, all 30 missions and a step-by-step walkthrough for each level. In the game, the **How to play** button in the top bar opens it.
 
 ## Run locally
 
