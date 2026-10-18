@@ -3174,5 +3174,60 @@ requestAnimationFrame(frame);
 })();
 </script>
 
+<style>
+.dpanel>.dhead .k{flex:1;min-width:0}
+.dpanel>.dhead{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.dpanel.dragging>.dhead{cursor:grabbing}
+.dpanel.dragging{box-shadow:0 6px 24px rgba(0,0,0,.45);z-index:30}
+.dctl{display:inline-flex;gap:4px;margin-left:6px;flex:none}
+.dctl button{all:unset;cursor:pointer;width:18px;height:18px;display:inline-grid;place-items:center;border:1px solid var(--line,#2a3238);border-radius:2px;color:var(--muted,#8a949a);font:600 12px/1 var(--mono,monospace)}
+.dctl button:hover,.dctl button:focus-visible{color:#e2a13b;border-color:#e2a13b}
+.dpanel.collapsed>:not(.dhead){display:none!important}
+.dpanel.collapsed{width:auto!important;min-width:180px}
+.dpanel.collapsed .dhead .v{display:none}
+</style>
+<script>
+(function(){
+  "use strict";
+  const IDS=['o_hill','d_bp','r_hb','f_vc','x_ptg','x_vc'];
+  const get=k=>{try{return JSON.parse(localStorage.getItem('ps-panel-'+k)||'null');}catch(_){return null;}};
+  const put=(k,v)=>{try{v===null?localStorage.removeItem('ps-panel-'+k):localStorage.setItem('ps-panel-'+k,JSON.stringify(v));}catch(_){}};
+  function clamp(el,x,y){const p=el.offsetParent||el.parentElement;if(!p)return [x,y];
+    const W=p.clientWidth,H=p.clientHeight,w=el.offsetWidth,h=el.offsetHeight;
+    return [Math.max(0,Math.min(x,W-w)),Math.max(0,Math.min(y,H-Math.min(h,32)))];}
+  function place(el,x,y){const [cx,cy]=clamp(el,x,y);el.style.left=cx+'px';el.style.top=cy+'px';el.style.right='auto';el.style.bottom='auto';}
+  function setup(el){
+    const id=el.id,head=el.querySelector('.row');if(!head||el.dataset.dp)return;el.dataset.dp='1';
+    el.classList.add('dpanel');head.classList.add('dhead');
+    head.title='Drag to move. Double-click to put back.';
+    const ctl=document.createElement('span');ctl.className='dctl';
+    const bMin=document.createElement('button');bMin.type='button';bMin.setAttribute('aria-label','Collapse panel');bMin.textContent='–';
+    const bRst=document.createElement('button');bRst.type='button';bRst.setAttribute('aria-label','Move panel back to its place');bRst.textContent='↺';
+    ctl.append(bMin,bRst);head.appendChild(ctl);
+    const st=get(id)||{};
+    const applyCol=c=>{el.classList.toggle('collapsed',!!c);bMin.textContent=c?'+':'–';bMin.setAttribute('aria-label',c?'Expand panel':'Collapse panel');};
+    applyCol(st.c);
+    if(st.x!=null)requestAnimationFrame(()=>place(el,st.x,st.y));
+    const save=()=>{const s=get(id)||{};if(el.style.left&&el.style.left!=='auto'){s.x=parseFloat(el.style.left);s.y=parseFloat(el.style.top);}s.c=el.classList.contains('collapsed');put(id,s);};
+    const reset=()=>{el.style.left=el.style.top=el.style.right=el.style.bottom='';const s=get(id)||{};delete s.x;delete s.y;put(id,s);};
+    bMin.addEventListener('click',e=>{e.stopPropagation();applyCol(!el.classList.contains('collapsed'));save();});
+    bRst.addEventListener('click',e=>{e.stopPropagation();reset();applyCol(false);save();});
+    ['pointerdown','mousedown','touchstart','wheel'].forEach(t=>el.addEventListener(t,e=>e.stopPropagation(),{passive:true}));
+    head.addEventListener('dblclick',e=>{if(e.target.closest('.dctl'))return;reset();});
+    let drag=null;
+    head.addEventListener('pointerdown',e=>{if(e.target.closest('.dctl')||e.button>0)return;
+      const p=el.offsetParent;if(!p)return;
+      drag={id:e.pointerId,dx:e.clientX-el.offsetLeft,dy:e.clientY-el.offsetTop};
+      place(el,el.offsetLeft,el.offsetTop);el.classList.add('dragging');head.setPointerCapture(e.pointerId);e.preventDefault();});
+    head.addEventListener('pointermove',e=>{if(!drag||e.pointerId!==drag.id)return;place(el,e.clientX-drag.dx,e.clientY-drag.dy);});
+    const end=e=>{if(!drag||e.pointerId!==drag.id)return;drag=null;el.classList.remove('dragging');save();};
+    head.addEventListener('pointerup',end);head.addEventListener('pointercancel',end);
+    window.addEventListener('resize',()=>{if(el.style.left&&el.style.left!=='auto')place(el,parseFloat(el.style.left),parseFloat(el.style.top));});
+  }
+  function init(){IDS.forEach(i=>{const el=document.getElementById(i);if(el)setup(el);});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+
 </body>
 </html>
